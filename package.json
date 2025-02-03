@@ -1,0 +1,22 @@
+{
+  "name": "htl-to-react-jsx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "convert": "ts-node ./src/convert.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/htmlparser2": "^3.10.7",
+    "html-minifier": "^4.0.0",
+    "htmlparser2": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/html-minifier": "^4.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
