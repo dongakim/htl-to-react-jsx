@@ -57,6 +57,8 @@ const convertHTLToReact = (htlCode: string): string => {
       let isSetHasKey: boolean = false;
       let isUnwrap: boolean = false;
       let unwrapCondition: null | string = null;
+      let repeat: string = "";
+      let repeatIdentifier: string = "";
 
       if (node.children.length > 0) {
         const parsedChildren = node.children.map(parse);
@@ -169,6 +171,12 @@ const convertHTLToReact = (htlCode: string): string => {
             console.log(styleText("yellow", "  [ REPEAT ]"));
             console.log(styleText("yellow", "    * key:"), key);
             console.log(styleText("yellow", "    * value:"), value);
+            const [block, identifier] = key.split(".");
+
+            repeat = value;
+            if (identifier) {
+              repeatIdentifier = identifier;
+            }
           } else if (key.startsWith("data-sly-text")) {
             console.log(styleText("yellow", "  [ TEXT ]"));
             console.log(styleText("yellow", "    * key:"), key);
@@ -242,6 +250,12 @@ const convertHTLToReact = (htlCode: string): string => {
               if (condition) {
                 jsx = `{${condition} && (${jsx})}`;
               }
+
+              if (repeat) {
+                jsx = `{${repeat}.map((${
+                  repeatIdentifier || "item"
+                }) => (<${tag}${attr}>${jsx}</${tag}>))}`;
+              }
             }
           } else {
             if (condition) {
@@ -250,11 +264,17 @@ const convertHTLToReact = (htlCode: string): string => {
               } else {
                 body = `if (${condition}) {${body}}`;
               }
+            }
+
+            if (repeat) {
+              jsx = `{${repeat}.map((${
+                repeatIdentifier || "item"
+              }) => (<${tag}${attr}></${tag}>))}`;
+            }
+
+            if (isUnwrap) {
             } else {
-              if (isUnwrap) {
-              } else {
-                jsx += `<${tag}${attr}></${tag}>`;
-              }
+              jsx += `<${tag}${attr}></${tag}>`;
             }
           }
         } else {
@@ -266,6 +286,12 @@ const convertHTLToReact = (htlCode: string): string => {
                 body = `if (${condition}) {${body}}`;
               }
             }
+          }
+
+          if (repeat) {
+            jsx = `{${repeat}.map((${
+              repeatIdentifier || "item"
+            }) => (${jsx}))}`;
           }
         }
       }
@@ -332,7 +358,7 @@ const convertHTLToReact = (htlCode: string): string => {
 
 // Main function
 const main = (): void => {
-  const htlFilePath = "./htl-components/heroimage.html"; // Input file path
+  const htlFilePath = "./htl-components/tabs.html"; // Input file path
   const outputFilePath = "./output.tsx"; // Output file path
 
   const htlCode = fs.readFileSync(htlFilePath, "utf8");
